@@ -1,0 +1,119 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                              Call of Night MT4   |
+//|                              Developed by Forex Robot Easy Team   |
+//|                                                forexroboteasy.com|
+//+------------------------------------------------------------------+
+#property strict
+
+// Indicator variables
+double indicatorValue;
+
+// Price Action variables
+int priceActionSignal;
+
+// Trade variables
+int lotSize;
+int stopLoss;
+int takeProfit;
+
+//+------------------------------------------------------------------+
+//| Custom Indicator                                                  |
+//+------------------------------------------------------------------+
+void CustomIndicator()
+{
+    // Indicator logic
+    indicatorValue = iCustom(NULL, 0, 'IndicatorName', 0, 0);
+    
+    // Display indicator value on the chart
+    Comment('Indicator Value: ', indicatorValue);
+    
+    // Check indicator conditions
+    if (indicatorValue > 0)
+    {
+        // Alert or notify user
+        Alert('Indicator condition met!');
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Price Action Filter                                               |
+//+------------------------------------------------------------------+
+void PriceActionFilter()
+{
+    // Price Action logic
+    priceActionSignal = iCustom(NULL, 0, 'PriceActionFilter', 0, 0);
+    
+    // Interpret Price Action signal
+    switch (priceActionSignal)
+    {
+        case 1:
+            // Price Action condition 1 met
+            Comment('Price Action Condition 1 met');
+            break;
+        case 2:
+            // Price Action condition 2 met
+            Comment('Price Action Condition 2 met');
+            break;
+        default:
+            // No Price Action condition met
+            Comment('No Price Action Condition met');
+            break;
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Trade Execution                                                   |
+//+------------------------------------------------------------------+
+void TradeExecution()
+{
+    // Execute trades based on indicator and Price Action signals
+    if (indicatorValue > 0 && priceActionSignal == 1)
+    {
+        // Open a buy trade
+        int ticket = OrderSend(Symbol(), OP_BUY, lotSize, Ask, 0, stopLoss, takeProfit, 'Buy Trade', 0, 0, Green);
+        
+        // Check if trade was successfully opened
+        if (ticket > 0)
+        {
+            // Trade opened successfully
+            Comment('Buy trade opened');
+            
+            // Close the trade after some time
+            Sleep(5000);
+            bool tradeClosed = OrderClose(ticket, lotSize, Bid, 0, Red);
+            
+            // Check if trade was successfully closed
+            if (tradeClosed)
+            {
+                // Trade closed successfully
+                Comment('Buy trade closed');
+            }
+            else
+            {
+                // Error occurred while closing the trade
+                Comment('Error closing buy trade');
+            }
+        }
+        else
+        {
+            // Error occurred while opening the trade
+            Comment('Error opening buy trade');
+        }
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Main Entry Point                                                  |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+    // Call custom indicator function
+    CustomIndicator();
+    
+    // Call Price Action filter function
+    PriceActionFilter();
+    
+    // Call trade execution function
+    TradeExecution();
+}
